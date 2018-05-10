@@ -1,0 +1,31 @@
+
+.js-load {
+    display: none;
+}
+.js-load.active {
+    display: block;
+}
+.is_comp.js-load:after {
+    display: none;
+}
+.btn-wrap, .lists, .main {
+    display: block;
+}
+.main {
+    max-width: 55%;
+    margin: 0 auto;
+}
+.lists {
+    margin-bottom: 4rem;
+}
+.lists__item {
+    padding: 3px 25px;
+    background: #EEE;
+}
+.lists__item:nth-child(2n) {
+    background: #E6E6E6;
+    /* color: #fff; */
+}
+.btn-wrap {
+    text-align: center;
+}

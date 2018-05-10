@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+ 
+    <!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+    
+    <!-- Enables the Spring MVC @Controller programming model -->
+    <annotation-driven />
+ 
+    <!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+    <resources mapping="/resources/**" location="/resources/" />
+    <!-- 반드시 webapp/resources 폴더에 생성한다. -->
+    
+    <!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+    <beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <beans:property name="prefix" value="/WEB-INF/views/" />
+        <beans:property name="suffix" value=".jsp" />
+    </beans:bean>
+    
+    <context:component-scan base-package="icia.mvc.*" />
+    
+    <!-- Spring JNDI : DBCP -->
+    <beans:bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <beans:property name="jndiName" value="jdbc/Oracle"/>
+        <beans:property name="resourceRef" value="true"/>
+    </beans:bean>
+    
+	<!--
+    DBCP 와 Mybatis를 사용 하기 위함.. 
+     beans:bean 이라는 클래스를 만들어주고 그 안에 필드에 해당하는 것들의 이름이
+    beans:property 의 name이다,  beans:property는 set의 역할을 수행 하여 
+    저 name에 해당하는거의 값에 value 값을 넣어줌
+    name="resourceRef" value="true" 이건 그냥 넣어주는거 필요함
+  	-->
+  
+  <!-- sqlSessionFactory :: Mybatis가 사용 -->
+  <beans:bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+      <beans:property name="dataSource" ref="dataSource"/>
+      <beans:property name="mapperLocations" value="classpath:icia/**/mapper/*.xml"/>
+      <beans:property name="configLocation" value="classpath:icia/mvc/dao/mybatis-config.xml"/>
+    </beans:bean>      
+      <!-- value="/WEB-INF/mybatis/mapper/memberMapper.xml" -->
+      
+  <!--  
+  db랑 spring 연결하기위한 session빈 생성 
+  dataSource라는 필드에 위에서 선언해준 DBCP (dataSource)를 값으로 참조..ref
+  mapperLocations의 경로대로 폴더랑 파일 생성해줘야함
+   -->
+    
+  
+  <!-- DAO using 개발자가 사용할 꺼 -->
+
+ 
+	<beans:bean id="nDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.INoteDAO"/>
+	</beans:bean>
+
+   <beans:bean id="mDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.ImemberDao"/>
+	</beans:bean>
+	<!-- sqlSessionFactory의 xml를 인터페이스를 묶어서(mapping)해서 Dao를 생성 Mapper파일을 보면 맨 위에 mapper namespace를 확인할 수 있다  -->
+
+   <beans:bean id="aDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.IadminDAO"/>
+	</beans:bean>
+  
+	 <beans:bean id="qDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+			<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+			<beans:property name="mapperInterface" value="icia.mvc.dao.QuestionDAO"/>
+	</beans:bean>
+	
+	<beans:bean id="sDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+			<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+			<beans:property name="mapperInterface" value="icia.mvc.dao.SurvayDAO"/>
+	</beans:bean>
+	
+	<beans:bean id="lDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.IlocationDAO"/>
+	</beans:bean>
+	
+	<beans:bean id="stDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.SiteIntroDAO"/>
+	</beans:bean>
+	
+	<beans:bean id="pDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.PhotoDAO"/>
+	</beans:bean>
+	
+	<beans:bean id="noDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.InoticeDAO"/>
+	</beans:bean>
+	
+	<beans:bean id="cDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.IclassDAO"/>
+	</beans:bean>
+	
+	<beans:bean id="vDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.VoteDAO"/>
+	</beans:bean>
+	
+
+		<beans:bean id="msDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.IMySpaceDAO"/>
+	</beans:bean>
+	
+	<beans:bean id="fDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.IfreeDAO"/>
+	</beans:bean>
+	
+	
+	<beans:bean id="payDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<beans:property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+		<beans:property name="mapperInterface" value="icia.mvc.dao.IPaymentDAO"/>
+	</beans:bean>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- 트랜잭션 -->
+	<beans:bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<beans:property name="dataSource" ref="dataSource"/>
+	</beans:bean>	
+	<!-- @Transactional 사용하기 위해, 반드시 servlet-context.xml 에 설정해야 함 -->
+	<!-- transaction-manager="transactionManager" 생략 가능 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+
+<!-- 파일 첨부(Multipart Resolver 설정) : 
+         form 태그 enctype="multipart/form-data" 인 경우 서버의 Bean 으로 전달해줌 -->
+   <beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+      <beans:property name="defaultEncoding" value="UTF-8"/>
+      <beans:property name="maxUploadSize" value="100000000"/> <!-- 필수 -->
+      <beans:property name="maxInMemorySize" value="100000000"/> <!-- 옵션 -->
+   </beans:bean>
+
+
+
+	
+</beans:beans>

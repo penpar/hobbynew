@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- classMapper.xml : 클래스 관련 쿼리문 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.mvc.dao.IclassDAO">
+
+	<!-- 클래스 전체 목록 -->
+	<select id="getClassList" resultType="classBean">
+		SELECT * FROM CLASS_VIEW2
+	</select>
+	
+	<!-- 클래스 글쓰기 -->
+	<insert id="classWrite" parameterType="classBean" useGeneratedKeys="true" keyProperty="c_index">
+		INSERT INTO CLASS VALUES(SEQ_CLASS.NEXTVAL, #{cn_index}, #{m_id}, #{c_subject}, #{c_simpleContent}, #{c_minPerson}, #{c_maxPerson}, #{c_startDay}, #{c_endDay}, #{c_address}, #{c_price}, #{c_content}, #{c_refund}, 0, SYSDATE)
+		<selectKey keyProperty="c_index" resultType="int" order="AFTER">
+			SELECT SEQ_CLASS.CURRVAL FROM DUAL
+		</selectKey>
+	</insert>
+	
+	<!-- 클래스 투표url 입력 -->
+	<insert id="setVoteUrl" parameterType="classBean">
+		INSERT INTO CHANGE VALUES(#{c_index}, #{ch_voteUrl})
+	</insert>
+	
+	<!-- 클래스 파일 입력 -->
+	<insert id="classFileInsert" parameterType="files">
+		INSERT INTO CLASSFILE VALUES(#{c_index}, #{cs_index}, #{f_oriName}, #{f_newName})
+	</insert>
+	
+	<!-- 클래스 수정 시 파일 이름 가져오기 -->
+	<select id="getFileName" parameterType="map" resultType="String">
+		SELECT CF_ORINAME FROM CLASSFILE WHERE C_INDEX=#{c_index} AND CS_INDEX=#{cs_index}	
+	</select>
+	
+	<!-- 클래스 수정 시 파일 이름 가져오기 -->
+	<select id="getFileNames" parameterType="map" resultType="String">
+		SELECT CF_ORINAME FROM CLASSFILE WHERE C_INDEX=#{c_index} AND CS_INDEX=#{cs_index}	
+	</select>
+	
+	<!-- 클래스 수정 내용 업데이트 -->
+	<update id="classUpdate" parameterType="classBean">
+		UPDATE CLASS SET CN_INDEX=#{cn_index}, C_SUBJECT=#{c_subject}, C_SIMPLECONTENT=#{c_simpleContent}, C_MINPERSON=#{c_minPerson}, C_MAXPERSON=#{c_maxPerson}, C_STARTDAY=#{c_startDay}, C_ENDDAY=#{c_endDay}, C_ADDRESS=#{c_address}, C_PRICE=#{c_price}, C_CONTENT=#{c_content},C_REFUND=#{c_refund} WHERE C_INDEX=#{c_index} 
+	</update>
+	
+	<!-- 클래스 수정 투표url 업데이트 -->
+	<update id="updateVoteUrl" parameterType="classBean">
+		UPDATE CHANGE SET CH_VOTEURL=#{ch_voteUrl} WHERE C_INDEX=#{c_index} 
+	</update>
+	
+	<!-- 클래스 수정 시 new 파일 이름 가져오기 -->
+	<select id="getFileNewName" parameterType="map" resultType="String">
+		SELECT CF_NEWNAME FROM CLASSFILE WHERE C_INDEX=#{c_index} AND CS_INDEX=#{cs_index}	
+	</select>
+	
+	<!-- 클래스 수정 시 new 파일 이름 가져오기 -->
+	<select id="getFileNewNames" parameterType="map" resultType="String">
+		<if test="cs_index != -1">
+			SELECT CF_NEWNAME FROM CLASSFILE WHERE C_INDEX=#{c_index} AND CS_INDEX=#{cs_index}
+		</if>
+		<if test="cs_index == -1">
+			SELECT CF_NEWNAME FROM CLASSFILE WHERE C_INDEX=#{c_index}
+		</if>	
+	</select>
+	
+	<!-- 클래스 수정 시 파일 첨부할 경우 db 파일 삭제 -->
+	<delete id="classFileDelete" parameterType="map">
+		<if test="cs_index != -1">
+			DELETE FROM CLASSFILE WHERE C_INDEX=#{c_index} AND CS_INDEX=#{cs_index}
+		</if>
+		<if test="cs_index == -1">
+			DELETE FROM CLASSFILE WHERE C_INDEX=#{c_index}
+		</if> 
+	</delete>
+	
+	<!-- 클래스 삭제 -->
+	<delete id="classDelete" parameterType="int">
+		DELETE FROM CLASS WHERE C_INDEX=#{c_index}
+	</delete>
+	
+	<!-- 클래스 평점 가져오기 -->
+	<select id="getClassAver" parameterType="int" resultType="int">
+		SELECT A_RATE FROM AVER WHERE C_INDEX=#{c_index}
+	</select>
+	
+	<!-- 클래스 상세 설명 -->
+	<select id="getClassDetail" parameterType="int" resultType="classBean">
+		SELECT * FROM CLASS_VIEW2 WHERE C_INDEX=#{c_index}
+	</select>
+	
+	<!-- 클래스 작성자 소개 -->
+	<select id="getMemberInfo" parameterType="String" resultType="String">
+		SELECT M_INTRO FROM MEMBER WHERE M_ID=#{m_id}
+	</select>
+	
+	<!-- 클래스 상세설명 이미지 가져오기 -->
+	<select id="getExplainImg" parameterType="int" resultType="String">
+		SELECT CF_NEWNAME AS C_EXPLAINIMG FROM CLASSFILE WHERE C_INDEX=#{c_index} AND CS_INDEX=1
+	</select>
+	
+	<!-- 클래스 신청인원 목록 -->
+	<select id="getPayList" parameterType="int" resultType="pay">
+		SELECT P.*, M.M_NAME, M.M_GENDER FROM (SELECT * FROM PAYLIST) P, MEMBER M WHERE P.M_ID=M.M_ID AND P.C_INDEX=#{c_index}
+	</select>
+	
+	<!-- 클래스 후기 목록 -->
+	<select id="getClassReview" parameterType="int" resultType="review">
+		SELECT * FROM RE_VIEW2 WHERE C_INDEX=#{c_index}
+	</select>
+	
+	<!-- 후기 글쓰기 -->
+	<insert id="setClassReview" parameterType="review" useGeneratedKeys="true" keyProperty="re_index">
+		INSERT INTO REVIEW VALUES(SEQ_REVIEW.NEXTVAL, #{c_index}, #{m_id}, #{re_subject}, #{re_content}, SYSDATE)
+		<selectKey keyProperty="re_index" resultType="int" order="AFTER">
+			SELECT SEQ_REVIEW.CURRVAL FROM DUAL
+		</selectKey>
+	</insert>
+	
+	<!-- 후기 평점 입력 -->
+	<insert id="setAver" parameterType="review">
+		INSERT INTO AVER VALUES(#{c_index}, #{m_id}, #{re_index}, #{a_rate})
+	</insert>
+	
+	<!-- 후기 파일 입력 -->
+	<insert id="reviewFileInsert" parameterType="review">
+		INSERT INTO REVIEWFILE VALUES(SEQ_REVIEWFILE.NEXTVAL, #{re_index}, #{rf_oriName}, #{rf_newName})
+	</insert>
+	
+	<!-- 후기 수정 시 내용가져오기 -->
+	<select id="getReview" parameterType="int" resultType="review">
+		SELECT * FROM RE_VIEW2 WHERE RE_INDEX=#{re_index}
+	</select>
+	
+	<!-- 후기 내용 수정 -->
+	<update id="setReviewUpdate" parameterType="review">
+		UPDATE REVIEW SET RE_SUBJECT=#{re_subject}, RE_CONTENT=#{re_content} WHERE RE_INDEX=#{re_index}
+	</update>
+	
+	<!-- 후기 평점 수정 -->
+	<update id="updateAver" parameterType="review">
+		UPDATE AVER SET A_RATE=#{a_rate} WHERE RE_INDEX=#{re_index}
+	</update>
+	
+	<!-- 후기 삭제 -->
+	<delete id="reviewDel" parameterType="int">
+		DELETE FROM REVIEW WHERE RE_INDEX=#{re_index}
+	</delete>
+	
+	<!-- 후기 파일 개수 가져오기 -->
+	<select id="getReviewFileCount" parameterType="int" resultType="int">
+		SELECT COUNT(RE_INDEX) FROM REVIEWFILE WHERE RE_INDEX=#{re_index}
+	</select>
+	
+	<!-- 후기 파일이름 가져오기 -->
+	<select id="getReviewFile" parameterType="int" resultType="String">
+		SELECT RF_NEWNAME FROM REVIEWFILE WHERE RE_INDEX=#{re_index}
+	</select>
+	
+	<!-- 후기 파일 삭제(db) -->
+	<delete id="reviewFileDelete" parameterType="int">
+		DELETE FROM REVIEWFILE WHERE RE_INDEX=#{re_index}
+	</delete>
+	
+	<!-- 내가 쓴 투표 글 목록 가져오기 -->
+	<select id="getMyVoteList" parameterType="String" resultType="vote">
+		SELECT cb_index, cb_subject, cb_date FROM COMBOARD WHERE CB_SORT=2 AND M_ID=#{m_id}
+	</select>
+	
+	<!-- 클래스 댓글 가져오기 -->
+	<select id="getReplyList" parameterType="map" resultType="classReply">
+		<![CDATA[
+		SELECT * FROM 
+      	(SELECT ROWNUM AS RNUM, cr.* FROM (SELECT * FROM classReply where c_index = #{c_index} ORDER BY CR_DATE DESC) cr) 
+      	WHERE rnum>=#{pageNum}*7-6 and rnum<=#{pageNum}*7
+		 ]]>
+	</select>
+	
+	<!-- 댓글 총 갯수 가져오기 -->
+	<select id="getReplyCount" parameterType="int" resultType="int">
+		SELECT COUNT(c_index) FROM CLASSREPLY WHERE c_index = #{c_index}
+	</select>
+	
+	<!-- 클래스 댓글 쓰기 -->
+	<insert id="classReplyInsert" parameterType="classReply">
+		INSERT INTO CLASSREPLY VALUES(SEQ_CLASSREPLY.NEXTVAL, #{c_index}, #{m_id}, #{cr_content}, DEFAULT, #{secretChk})
+	</insert>
+	
+	<!-- 클래스 댓글 삭제 -->
+	<delete id="classReplyDelete" parameterType="int">
+		DELETE FROM CLASSREPLY WHERE CR_INDEX=#{cr_index}
+	</delete>
+	
+	<!-- 클래스 리스트 검색 -->
+	<select id="classSearch" parameterType="map" resultType="classBean">
+		<choose>
+			<when test='status == "0"'>
+				<if test='filter == "m_id"'>
+					SELECT * FROM CLASS_VIEW2 WHERE M_ID LIKE '%'||#{keyword}||'%'
+				</if>
+				<if test='filter == "c_subject"'>
+					SELECT * FROM CLASS_VIEW2 WHERE C_SUBJECT LIKE '%'||#{keyword}||'%'
+				</if>
+			</when>
+			<when test='status != "0"'>
+				<if test='filter == "m_id"'>
+					SELECT * FROM CLASS_VIEW2 WHERE C_STATUS=#{status} AND M_ID LIKE '%'||#{keyword}||'%'
+				</if>
+				<if test='filter == "c_subject"'>
+					SELECT * FROM CLASS_VIEW2 WHERE C_STATUS=#{status} AND C_SUBJECT LIKE '%'||#{keyword}||'%'
+				</if>
+			</when>
+		</choose>
+		<if test='status == null and keyword == null and filter ==  null and cn_index != null'>
+			SELECT * FROM CLASS_VIEW2 WHERE CN_INDEX=#{cn_index}
+		</if>
+		<if test='status != null and keyword == null and filter ==  null and cn_index == null'>
+			<if test='status != "0"'>
+				SELECT * FROM CLASS_VIEW2 WHERE C_STATUS=#{status}
+			</if>
+			<if test='status == "0"'>
+				SELECT * FROM CLASS_VIEW2 
+			</if>
+		</if>
+	</select>
+	
+	<!-- 로그인한 회원의 관심 클래스 리스트 가져오기 -->
+	<select id="myClassList" parameterType="String" resultType="int">
+		SELECT C_INDEX FROM ATTENTION WHERE M_ID=#{m_id}
+	</select>
+	
+	<!-- 관심 클래스 추가-->
+	<insert id="myClassAdd" parameterType="map">
+		INSERT INTO ATTENTION VALUES(#{c_index}, #{m_id})
+	</insert>
+	
+	<!-- 관심 클래스 추가-->
+	<delete id="myClassDel" parameterType="map">
+		DELETE FROM ATTENTION WHERE C_INDEX=#{c_index} AND M_ID=#{m_id}
+	</delete>
+	
+	<!-- 메인 클래스 평점순으로 불러오기 -->
+	<select id="rateList" resultType="classBean">
+		<![CDATA[
+		select v.* from (select rownum as rnum, cn.cn_name, cv2.* from classname cn, (select * from class_view2) cv2 where cn.cn_index=cv2.cn_index) v where rnum<=6 order by v.c_date desc
+		 ]]>
+	</select>
+	
+	<!-- 메인 클래스 평점순으로 불러오기 -->
+	<select id="dateList" resultType="classBean">
+	<![CDATA[
+		select v.* from (select rownum as rnum, cn.cn_name, cv2.* from classname cn, (select * from class_view2) cv2 where cn.cn_index=cv2.cn_index) v where rnum>=7 and rnum<=14 order by v.c_date desc
+		 ]]>
+	</select>
+	
+	
+	<!-- 로그인한 회원의 관심분야 리스트 가져오기 -->
+	<select id="userCheckList" parameterType="String" resultType="int">
+		SELECT CH_CHECK FROM CHECKS WHERE M_ID=#{m_id}
+	</select>
+</mapper>

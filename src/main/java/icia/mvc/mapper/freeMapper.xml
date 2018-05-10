@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"><!-- 이건 mapper 파일이고 버전은 3.0이다 -->
+
+<mapper namespace="icia.mvc.dao.IfreeDAO">
+
+	<!-- 자유게시판 작성란 분류목록 불러오기 -->
+	<select id="freeCN_indexCall" resultType="free">
+		SELECT * FROM CN_VIEW ORDER BY RNUM ASC
+	</select>
+	
+	<!-- 자유게시판 글 작성 시 게시판테이블 등록 -->
+	<insert id="comboardWrite" parameterType="free" useGeneratedKeys="true" keyProperty="cb_index">
+		INSERT INTO COMBOARD(CB_INDEX,M_ID,CB_SUBJECT,CB_CLICK,CB_CONTENT,CB_DATE,CB_SORT) 
+		VALUES(seq_comboard.NEXTVAL,#{m_id},#{cb_subject},'0',#{cb_content},sysdate,#{cb_sort})
+		<selectKey keyProperty="cb_index" resultType="int" order="AFTER">
+			SELECT seq_comboard.currval FROM DUAL
+		</selectKey>
+	</insert>
+
+	<!-- 자유게시판 글 작성 시 자유테이블 등록 -->
+	<insert id="freeBoardWrite" parameterType="free">
+		INSERT INTO FREEBOARD(CB_INDEX,FB_TITLE,CN_INDEX) VALUES(#{cb_index},#{fb_title},#{cn_index})
+	</insert>
+
+	<!-- 자유게시판  글 작성 시 파일테이블 등록 -->
+	<insert id="freeFileInsert" parameterType="files">
+		INSERT INTO FILES VALUES(seq_files.NEXTVAL,#{fs_index},#{cb_index},#{m_id},#{f_oriName},#{f_newName})
+	</insert>
+	
+	<!-- 자유게시판 리스트 불러오기 -->
+	<select id="freeList" parameterType="int" resultType="free">
+		SELECT * FROM FB_VIEW2 WHERE CB_SORT='1' ORDER BY CB_DATE DESC
+	</select>
+	
+	<!-- 자유게시판 상세보기 글 정보 가져오기-->
+	<select id="getFreeDetail" parameterType="int" resultType="free">
+		SELECT * FROM FB_VIEW2 WHERE CB_INDEX=#{cb_index}
+	</select>
+	
+	<!-- 자유게시판 상세보기 파일이름 전체 가져오기 -->
+	<select id="freeGetFile" parameterType="int" resultType="String">
+		SELECT f_newName FROM files WHERE cb_index=#{cb_index}
+	</select>
+	
+	<!-- 자유게시판 댓글 입력 -->
+	<insert id="b_FreeComWrite" parameterType="free">
+		INSERT INTO COMMENTS VALUES(SEQ_COMMENTS.NEXTVAL,#{cb_index},#{m_id},#{co_content},sysdate,#{secretChk})
+	</insert>
+	
+	<!-- 댓글 리스트 가져오기 -->
+	<select id="getCommList" parameterType="free" resultType="free">
+		<![CDATA[
+		SELECT * FROM 
+		(SELECT ROWNUM AS RNUM, cm.* FROM (SELECT * FROM comments cm where cb_index = #{cb_index} ORDER BY CO_DATE DESC) cm) 
+		WHERE rnum>=#{pageNum}*7-6 and rnum<=#{pageNum}*7
+		 ]]>
+	</select>
+	
+	<!-- 댓글 총 갯수 가져오기 -->
+	<select id="commCount" parameterType="int" resultType="int">
+		SELECT COUNT(co_index) FROM comments WHERE cb_index = #{cb_index}
+	</select>
+	
+	<!-- 댓글 삭제 -->
+	<delete id="comDelete" parameterType="int">
+    	DELETE FROM comments WHERE co_index = #{co_index}
+    </delete>
+	
+	<!-- 파일 리스트 가져오기 -->
+	<select id="freeGetFiles" parameterType="int" resultType="free">
+		SELECT * FROM FILES WHERE CB_INDEX=#{cb_index}
+	</select>
+	
+	<!-- 자유게시판 수정 시 해당 글 파일 갯수 가져오기 -->
+	<!-- <select id="freeFileCount" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM FILES WHERE CB_INDEX = #{cb_index}
+	</select> -->
+	
+	<!-- 자유게시판 수정 시 해 당 글 파일 이름 가져오기-->
+	<select id="findDelFile" parameterType="int" resultType="free">
+		SELECT * FROM FILES WHERE CB_INDEX=#{cb_index}
+	</select>
+	
+	
+	<!-- 자유게시판 수정 시 해당 글의 기존 파일 모두 제거-->
+	<delete id="freeFileDelete" parameterType="free">
+		DELETE FROM FILES WHERE CB_INDEX=#{cb_index}
+	</delete>
+	
+	<!-- 자유게시판 수정 시 게시판테이블 업데이트 -->
+	<update id="comboardChange" parameterType="free">
+		UPDATE COMBOARD SET CB_SUBJECT=#{cb_subject},CB_CONTENT=#{cb_content} WHERE CB_INDEX=#{cb_index}
+	</update>
+	
+	<!-- 자유게시판 수정 시 자유테이블 업데이트 -->
+	<update id="b_freeChange" parameterType="free">
+		UPDATE FREEBOARD SET FB_TITLE=#{fb_title},CN_INDEX=#{cn_index} WHERE CB_INDEX=#{cb_index}
+	</update>
+	
+	<!-- 자유게시판 글 삭제 시 DB파일 삭제 -->
+	<delete id="freeFileDel" parameterType="int">
+		DELETE FROM FILES WHERE CB_INDEX=#{cb_index}
+	</delete>
+	
+	<!-- 자유게시판 글 삭제 시 자유테이블 삭제 -->
+	<delete id="b_FreeDel" parameterType="int">
+		DELETE FROM FREEBOARD WHERE CB_INDEX=#{cb_index}
+	</delete>
+	
+	<!-- 자유게시판 글 삭제 시 게시판테이블 삭제 -->
+	<delete id="comboardFreeDel" parameterType="int">
+		DELETE FROM COMBOARD WHERE CB_INDEX=#{cb_index}
+	</delete>
+	
+	<!-- 자유게시판 댓글 페이징 -->
+	<select id="getFreeCommList" parameterType="free" resultType="free">
+		<![CDATA[
+		SELECT * FROM 
+		(SELECT ROWNUM AS RNUM, cm.* FROM (SELECT * FROM comments cm where cb_index = #{cb_index} ORDER BY CO_DATE DESC) cm) 
+		WHERE rnum>=#{pageNum}*7-6 and rnum<=#{pageNum}*7
+		 ]]>
+	</select>
+	
+	<!-- 조회수 증가 -->
+	<update id="viewUp" parameterType="int">
+		UPDATE comBoard SET cb_click = cb_click+1 WHERE cb_index=#{cb_index}
+	</update>
+	
+	<!-- 조회수 가져오기 -->
+	<select id="getViewUp" parameterType="int" resultType="int">
+		SELECT cb_click FROM comBoard WHERE cb_index=#{cb_index}
+	</select>
+	
+	<select id="myBookList" parameterType="map" resultType="int">
+		SELECT count(*) FROM RECOMMAND WHERE m_id = #{m_id} AND cb_index = #{cb_index}
+	</select>
+	
+	
+	
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- boardMapper.xml : 게시판관련 쿼리문 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.mvc.dao.INoteDAO">
+	<!-- 받은 쪽지 목록 -->
+	<select id="getNoteList_0" parameterType="String" resultType="icia.mvc.bean.Note">
+		SELECT N.N_INDEX, N.M_ID, N.M_ID2, N.N_STATE, TO_CHAR(N_DATE,'yyyy/mm/dd') AS N_DATE, N.N_SUBJECT, N.N_CONTENT
+		FROM NOTE N
+		WHERE m_id = #{id}
+		order by N.N_INDEX DESC
+	</select>
+	
+	<!-- 보낸 쪽지 목록 -->
+	<select id="getNoteList_1" parameterType="String" resultType="icia.mvc.bean.Note">
+		SELECT N.N_INDEX, N.M_ID, N.M_ID2, N.N_STATE, TO_CHAR(N_DATE,'yyyy/mm/dd') AS N_DATE, N.N_SUBJECT, N.N_CONTENT
+		FROM NOTE N
+		LEFT JOIN BLACKLIST B ON N.M_ID = B.M_ID2
+		WHERE N.M_ID2 = #{id} AND B.M_ID2 IS NULL
+		order by N.N_INDEX DESC
+	</select>
+	
+	<!-- 쪽지 작성 -->
+	<insert id="noteInsert" parameterType="icia.mvc.bean.Note">
+		INSERT INTO NOTE VALUES(SEQ_NOTE.NEXTVAL, #{m_id}, #{m_id2}, #{n_state}, to_char(sysdate,'yyyy/mm/dd') ,#{n_subject}, #{n_content}, #{n_sort})
+	</insert>
+	
+	<!-- 보낸 쪽지 삭제 -->
+	<delete id="noteDelete" parameterType="int">
+		UPDATE NOTE SET N_STATE = '3' WHERE n_index = #{index}
+	</delete>
+	
+	<!-- 쪽지 상세보기 -->
+	<select id="noteDetail" parameterType="int" resultType="icia.mvc.bean.Note">
+			SELECT * FROM NOTE WHERE n_index = #{index}
+	</select>
+	
+	<!-- 쪽지 차단 (해당 아이디)-->
+	<insert id="noteBlock" parameterType="map">
+		INSERT INTO BlackList VALUES(#{M_ID}, #{M_ID2})
+	</insert>
+	
+	<!-- 읽은 쪽지로 변경 -->
+	<update id="noteWriteChange" parameterType="int">
+		UPDATE NOTE SET N_SORT = '1' WHERE n_index = #{index}
+	</update>
+	
+	<!-- 안읽은 쪽지 개수 -->
+	<select id="noteCount" parameterType="String" resultType="int">
+	SELECT count(N_SORT)
+	FROM NOTE N
+	LEFT JOIN BLACKLIST B ON N.M_ID = B.M_ID2
+	WHERE N.M_ID2 = #{id} AND B.M_ID2 IS NULL AND n_sort = '0'
+	</select>
+	
+	
+	<select id="noteState" parameterType="icia.mvc.bean.Note">
+		UPDATE NOTE SET N_STATE = #{n_state} WHERE n_index = #{n_index}
+	</select>
+	
+
+	<!-- 자동 알림 쪽지 (마감 하루전)-->
+	<select id="noteAuto" parameterType="String" resultType="String">
+		SELECT C_SUBJECT FROM ATTENTION A
+		LEFT JOIN CLASS C ON A.C_INDEX = C.C_INDEX
+		WHERE C_STARTDAY = to_char(sysdate+1,'yyyy/mm/dd') AND A.M_ID = #{id}
+	</select>
+	
+	<!-- 자동 알림 쪽지 아이디 체크 -->
+	<select id = "noteCheck" parameterType="String" resultType="int">
+		SELECT count(*) FROM NOTE
+		WHERE M_id = 'admin' AND M_ID2 = 'aaaaaa' AND to_CHAR(N_DATE,'yyyy/mm/dd') = to_CHAR(sysdate,'yyyy/mm/dd')
+	</select>
+	
+	<!-- 자신에게 보냄 방지 -->
+	<select id = "checkId" parameterType="String" resultType="int">
+		SELECT count(*) FROM MEMBER
+		WHERE M_ID = #{m_id2} 
+	</select>
+	
+	<!-- 쪽지 상세보기 -->
+	<select id = "noteM_id2" parameterType="int" resultType="Note">
+		SELECT * FROM NOTE WHERE n_index = #{index}
+	</select>
+			
+	<!-- 신고 작성  -->		
+	<insert id = "banInsert" parameterType="Report">
+		 INSERT INTO REPORT VALUES(SEQ_report.NEXTVAL,#{m_id},#{m_id2},#{rp_index},#{rp_sort},#{rp_reason},#{rp_content},to_char(sysdate,'yyyy/mm/dd'))
+	</insert>	
+
+</mapper>

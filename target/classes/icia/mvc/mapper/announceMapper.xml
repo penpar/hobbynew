@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"><!-- 이건 mapper 파일이고 버전은 3.0이다 -->
+
+<mapper namespace="icia.mvc.dao.InoticeDAO">
+
+	<!-- 공지사항 등록 시 게시판테이블 등록 -->
+	<insert id="b_NoticeWrite" parameterType="Notice" >
+		INSERT INTO COMBOARD(CB_INDEX,M_ID,CB_SUBJECT,CB_CLICK,CB_CONTENT,CB_DATE,CB_SORT) 
+		VALUES(seq_comboard.NEXTVAL,#{m_id},#{cb_subject},'0',#{cb_content},sysdate,#{cb_sort})
+		<selectKey keyProperty="cb_index" resultType="int" order="AFTER">
+			SELECT seq_comboard.currval FROM DUAL
+		</selectKey>
+	</insert>
+	
+	<!-- 공지사항 등록 시 공지사항 테이블에 등록 -->
+	<insert id="b_Announce" parameterType="Notice">
+		INSERT INTO ANNOUNCE(CB_INDEX,an_main) VALUES(#{cb_index},#{mainChk}) 
+	</insert>
+	
+	<!-- 공지사항 등록 시 파일테이블에 파일등록 -->
+	<insert id="b_AnFileInserte" parameterType="map">
+		INSERT INTO FILES VALUES(SEQ_FILES.NEXTVAL, #{fs_index},  #{cb_index}, #{m_id}, #{oriFileName}, #{sysFileName})
+	</insert>
+	
+	<!-- 게시글 리스트 불러오기 -->
+		<select id="getboardList" parameterType="int" resultType="Notice">
+			SELECT * FROM COMBOARD WHERE CB_SORT='0' OR CB_SORT='6' ORDER BY CB_DATE DESC
+		</select>
+		
+	<!-- 공지사항 상세보기 -->
+		<select id="getboardDetail" parameterType="int" resultType="Notice">
+			SELECT * FROM AN_VIEW WHERE CB_INDEX=#{cb_index}
+		</select>
+		
+		
+	<!-- 공지사항 수정& 삭제 시 기존 파일 삭제 -->
+		<delete id="anFileDel" parameterType="int">
+			DELETE FROM FILES WHERE CB_INDEX=#{cb_index}
+		</delete>
+		
+	<!-- 공지사항 수정 시 게시판 테이블 업데이트 -->
+	<update id="b_NoticeChange" parameterType="Notice">
+		UPDATE COMBOARD SET CB_SUBJECT=#{cb_subject}, CB_CONTENT=#{cb_content},CB_SORT=#{cb_sort} WHERE CB_INDEX=#{cb_index}
+	</update>
+	
+	
+	<!-- 공지사항 수정 시 공지사항 테이블 업데이트 -->
+		<!-- <update id="b_AnnounceChange" parameterType="Notice">
+			UPDATE ANNOUNCE(CB_INDEX,an_main) VALUES(#{cb_index},#{cb_sort}) 
+		</update> -->
+	
+	
+	<!-- 공지사항 수정 시 파일테이블 업데이트  -->
+		<update id="b_AnFileChange" parameterType="Map">
+			INSERT INTO FILES VALUES(SEQ_FILES.NEXTVAL, #{fs_index},  #{cb_index}, #{m_id}, #{oriFileName}, #{sysFileName})
+		</update>
+
+	<!-- 공지사항 삭제 시 공지사항 테이블 삭제-->
+		<delete id="announceDel" parameterType="int">
+			DELETE FROM ANNOUNCE WHERE CB_INDEX=#{cb_index}
+		</delete>
+		
+		
+	<!-- 공지사항 삭제 시 게시판 테이블 삭제 -->
+		<delete id="comboardDel" parameterType="int">
+			DELETE FROM COMBOARD WHERE CB_INDEX=#{cb_index}
+		</delete>
+		
+	<!-- 공지사항 분류 -->
+		<select id="b_NoticeSort" parameterType="int" resultType="Notice">
+			SELECT * FROM COMBOARD WHERE CB_SORT=#{cb_sort} ORDER BY CB_DATE DESC
+		</select>
+		
+		<!-- 게시글 리스트 불러오기 -->
+		<!-- <select id="getboardList" parameterType="int" resultType="Notice">
+			SELECT * FROM COMBOARD WHERE CB_SORT='0' OR CB_SORT='6' ORDER BY CB_DATE DESC
+		</select> -->
+	
+		<!-- 게시글 리스트 불러오기 -->
+		<update id="removeChk">
+			UPDATE announce SET an_main=0 WHERE an_main = 1
+		</update>
+
+		<!-- 메인에 공지사항 뿌리기 -->
+		<select id="getAnnList" resultType="Notice">
+			SELECT * FROM AN_VIEW WHERE an_main = 1
+		</select>
+</mapper>

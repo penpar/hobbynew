@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- boardMapper.xml : 게시판관련 쿼리문 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.mvc.dao.IMySpaceDAO" >
+
+	<select id = "MyWriteList" parameterType="String" resultType="Board">
+	SELECT * FROM COMBOARD WHERE m_id = #{id}
+	</select>
+	
+	<select id = "MyBookList" parameterType="String" resultType="Board">
+	    SELECT * FROM COMBOARD C
+        RIGHT JOIN RECOMMAND R ON C.CB_INDEX = R.CB_INDEX
+        WHERE R.M_ID = #{id}
+	</select>
+	
+	<select id="MyClassImg" parameterType="int" resultType="icia.mvc.bean.ClassBean">
+		SELECT * FROM CLASS_VIEW2 WHERE C_INDEX=#{c_index}
+	</select>
+	
+	<insert id="myBookIn" parameterType="map">
+	
+		INSERT INTO RECOMMAND VALUES(#{index},#{id},2)
+	
+	</insert>
+	
+	
+	<delete id = "myBookDel" parameterType="map">
+		
+		DELETE FROM RECOMMAND WHERE m_id = #{id} AND CB_INDEX = #{index}
+		
+	</delete>
+	
+	<delete id = "myClassDel" parameterType="map">
+		
+		DELETE FROM ATTENTION WHERE m_id = #{id} AND C_INDEX = #{index}
+		
+	</delete>
+	
+	<select id = "MyWriteClassList" parameterType="String" resultType="ClassBean">
+		SELECT * FROM Class WHERE m_id = #{id}
+	</select>
+	
+	<select id = "MyClassList" parameterType="String" resultType="ClassBean">
+		SELECT C.C_INDEX, C.M_ID, C.C_SUBJECT, C.C_SIMPLECONTENT, C.C_MINPERSON, C.C_MAXPERSON, C.C_STARTDAY, C.C_ENDDAY, C.C_ADDRESS , C.C_PRICE, C.C_CONTENT, C.C_REFUND, C.C_STATUS, C.C_DATE FROM CLASS C
+		LEFT JOIN ATTENTION A ON A.C_INDEX = C.C_INDEX
+        WHERE A.m_id = #{id}
+	</select>
+	
+	<select id = "MyClassEnrolled" parameterType="int" resultType="int">
+		
+		 SELECT COUNT(*) FROM Paylist WHERE C_INDEX= #{c_index}
+	</select>
+</mapper>

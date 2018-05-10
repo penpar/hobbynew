@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.mvc.dao.PhotoDAO">
+	
+	<!-- 포토 갤러리 - 공통 게시판 글쓰기 -->
+	<insert id="comboardWrite" parameterType="photo" useGeneratedKeys="true" keyProperty="cb_index">
+		INSERT INTO comboard VALUES(seq_comboard.NEXTVAL, #{m_id}, #{cb_subject}, 0, #{cb_content}, default, #{cb_sort})
+		<selectKey keyProperty="cb_index" resultType="int" order="AFTER">
+			SELECT seq_comboard.currval FROM DUAL
+		</selectKey>
+	</insert>
+	
+	<!-- 포토 갤러리 - 파일 업로드 -->
+	<insert id="photoFileInsert" parameterType="files">
+		INSERT INTO files VALUES(SEQ_FILES.NEXTVAL, #{fs_index},  #{cb_index}, #{m_id}, #{f_oriName}, #{f_newName})
+	</insert>
+	
+	<!-- 포토 갤러리 - 리스트 불러오기 -->
+	<!-- dto 사용(리스트) : resultType에 bean Alias 이름 -->
+    <!-- <select id="photoList" parameterType="map" resultType="photo">
+        SELECT * FROM (SELECT ROWNUM AS RNUM, CB.* FROM (SELECT * FROM COMBOARD WHERE CB_SORT=3 ORDER BY CB_DATE DESC) CB) WHERE RNUM BETWEEN #{divMinCount} AND #{divMaxCount}
+    </select> -->
+    <select id="photoList" resultType="photo">
+        SELECT * FROM COMBOARD WHERE CB_SORT=3 ORDER BY CB_DATE DESC
+    </select>
+    <!-- 해당 글의 첫번째 사진 이름 가져오기 -->
+    <select id="getPhotoFile" parameterType="int" resultType="String">
+        SELECT F_NEWNAME FROM (SELECT ROWNUM AS RRNUM, FS.* FROM FILES_SINGLE FS WHERE CB_INDEX = #{CB_INDEX}) A WHERE A.RRNUM = 1
+    </select>
+    
+    <!-- 포토 갤러리 - 상세보기 -->
+    <select id="photoAjax" parameterType="int" resultType="photo">
+        SELECT * FROM comboard WHERE cb_index = #{cb_index}
+    </select>
+    
+    <!-- 포토 갤러리 상세보기 할 시 사진 갯수 가져오기 -->
+    <select id="photoFileCount" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM FILES WHERE CB_INDEX = #{cb_index}
+    </select>
+    
+    <!-- 해당 글의 사진 이름 전체 가져오기 -->
+    <select id="getAllFileName" parameterType="map" resultType="String">
+        SELECT F_NEWNAME FROM (SELECT ROWNUM AS RRNUM, FS.* FROM FILES_SINGLE FS WHERE CB_INDEX = #{cb_index}) A WHERE A.RRNUM = #{rnum}
+    </select>
+    
+    <!-- 포토 갤러리 수정(미리 값 찍어놓기) -->
+    <!-- UPDATE [테이블 이름] SET [컬럼 이름] = [변경할 값] WHERE [조건] -->
+    <select id="photoGallery_update" parameterType="int" resultType="photo">
+		SELECT * FROM comboard WHERE cb_index = #{cb_index}
+	</select>
+	
+	<!-- 수정 시 파일 이름 가져오기 -->
+    <select id="getOriFileName" parameterType="map" resultType="String">
+		SELECT f_oriName FROM (SELECT ROWNUM AS RRNUM, FS.* FROM FILES_SINGLE FS WHERE CB_INDEX = #{cb_index}) A WHERE A.RRNUM = #{rnum}
+	</select>
+	
+	<!-- 수정 시 기존 파일 삭제 -->
+	<delete id="photoFileDelete" parameterType="photo">
+		DELETE FROM files WHERE cb_index = #{cb_index}
+	</delete>
+	
+	<!-- 글 수정 -->
+	<!-- UPDATE emp SET hiredate = '17/12/09' WHERE ename = 'han'; -->
+    <update id="photoUpdate" parameterType="photo">
+    	UPDATE comboard SET cb_subject = #{cb_subject}, cb_content = #{cb_content} WHERE cb_index = #{cb_index}
+    </update>
+    
+    <!-- 글 삭제 -->
+	<!-- DELETE FROM employees WHERE salary = 10000000; -->
+    <delete id="photoGallery_delete" parameterType="int">
+    	DELETE FROM comboard WHERE cb_index = #{cb_index}
+    </delete>
+    
+    <!-- 글 삭제 시 파일 이름 찾기 -->
+    <select id="photoDelete" parameterType="map" resultType="files">
+		SELECT fs_index, f_newName FROM (SELECT ROWNUM AS RRNUM, FS.* FROM FILES_SINGLE FS WHERE CB_INDEX = #{cb_index}) A WHERE A.RRNUM = #{rnum}
+	</select>
+    
+     <!-- 글 삭제 시 실제 파일도 삭제 -->
+	<!-- DELETE FROM employees WHERE salary = 10000000; -->
+    <!-- <delete id="photoDelete" parameterType="int">
+    	DELETE FROM comboard WHERE cb_index = #{cb_index}
+    </delete> -->
+        
+	<!-- 포토 갤러리 - 포인트 부여 -->
+	<update id="photoPoint" parameterType="String">
+    	UPDATE Point SET p_point = p_point+5 WHERE m_id = #{m_id}
+    </update>	
+
+</mapper>
+

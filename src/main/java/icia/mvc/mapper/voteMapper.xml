@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ebMapper.xml : 한은비 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.mvc.dao.VoteDAO">
+	
+	<!-- 투표 게시판 - 공통 게시판 글쓰기 -->
+	<insert id="comboardWrite" parameterType="vote" useGeneratedKeys="true" keyProperty="cb_index">
+		INSERT INTO comboard VALUES(seq_comboard.NEXTVAL, #{m_id}, #{cb_subject}, 0, #{cb_content}, default, #{cb_sort})
+		<selectKey keyProperty="cb_index" resultType="int" order="AFTER">
+			SELECT seq_comboard.currval FROM DUAL
+		</selectKey>
+	</insert>
+	
+	<!-- 투표 게시판 - 파일 업로드 // 수정 시에도 동일 -->
+	<insert id="voteFileInsert" parameterType="files">
+		INSERT INTO files VALUES(SEQ_FILES.NEXTVAL, #{fs_index},  #{cb_index}, #{m_id}, #{f_oriName}, #{f_newName})
+	</insert>
+	
+	<!-- 투표 게시판 - 글쓰기 -->
+	<insert id="voteWrite" parameterType="vote">
+		INSERT INTO vote VALUES(#{cb_index}, #{v_startDay},  #{v_endDay}, #{v_person}, #{v_subject}, #{v_content}, #{selectChk})
+	</insert>
+	
+	<!-- 투표 게시판 - 항목 이름 글쓰기 -->
+	<insert id="voteItemWrite" parameterType="map">
+		INSERT INTO voteItem VALUES(#{cb_index}, #{vi_name})
+	</insert>
+	
+	<!-- 투표 게시판 - 리스트 불러오기 -->
+    <select id="voteList" resultType="vote">
+        SELECT * FROM VOTE_VIEW2 WHERE CB_SORT=2 ORDER BY CB_DATE DESC
+    </select>
+    
+    <!-- 해당 글의 첫번째 사진 이름 가져오기 -->
+    <select id="getVoteFile" parameterType="int" resultType="String">
+        SELECT F_NEWNAME FROM (SELECT ROWNUM AS RRNUM, FS.* FROM VOTE_SINGLE FS WHERE CB_INDEX = #{CB_INDEX}) A WHERE A.RRNUM = 1
+    </select>
+    
+    <!-- 투표 게시판 - 상세보기 -->
+    <select id="voteDetail" parameterType="int" resultType="vote">
+        SELECT DISTINCT(F.FS_INDEX), V2.* FROM VOTE_VIEW2 V2 LEFT OUTER JOIN(SELECT CB_INDEX, FS_INDEX FROM FILES) F ON V2.CB_INDEX=F.CB_INDEX WHERE V2.CB_INDEX = #{cb_index}
+    </select>
+    
+    <!-- 해당 글의 사진 이름 전체 가져오기 -->
+    <select id="voteGetFile" parameterType="int" resultType="String">
+        SELECT f_newName FROM files WHERE cb_index = #{cb_index}
+    </select>
+    
+    <!-- 해당 글의 투표 항목 가져오기 -->
+    <select id="voteName" parameterType="int" resultType="String">
+        SELECT vi_name FROM VoteItem WHERE cb_index = #{cb_index}
+    </select>
+    
+    <!-- 삭제 시 사진 갯수 가져오기 -->
+    <select id="voteFileCount" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM FILES WHERE CB_INDEX = #{cb_index}
+    </select>
+    
+    <!-- 투표하기 -->
+    <insert id="vSelect" parameterType="vote">
+		INSERT INTO votePerson VALUES(#{cb_index}, #{m_id}, #{vp_name})
+	</insert>
+
+	<!-- 투표 항목 가져오기 -->
+	<select id="getItemList" parameterType="int" resultType="vote">
+        SELECT cb_index, vi_name as vp_name FROM voteItem WHERE CB_INDEX = #{cb_index}
+    </select>
+    
+    <!-- 투표 항목별 인원 가져오기 -->
+    <select id="getPeople" parameterType="vote" resultType="int">
+        SELECT COUNT(vp_name) AS V_PEOPLE FROM votePerson WHERE CB_INDEX=#{cb_index} AND VP_NAME = #{vp_name}
+    </select>
+    
+	<!-- 투표 인원 가져오기 -->
+	<select id="getVotePerson" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM votePerson WHERE CB_INDEX = #{cb_index}
+    </select>
+    
+    <!-- 투표 했는지 유무 확인-->
+	<select id="voteCheck" parameterType="map" resultType="int">
+		SELECT COUNT(M_ID) FROM VOTEPERSON WHERE M_ID=#{m_id} AND CB_INDEX=#{cb_index}
+	</select>
+	
+	<!-- 조회수 증가 -->
+    <update id="viewUp" parameterType="int">
+        UPDATE comBoard SET cb_click = cb_click+1 WHERE cb_index=#{cb_index}
+    </update>
+	
+	<!-- 조회수 가져오기 -->
+	<select id="getViewUp" parameterType="int" resultType="int">
+		SELECT cb_click FROM comBoard WHERE cb_index=#{cb_index}
+	</select>
+	
+	<!-- 댓글 쓰기 -->
+	<insert id="comment" parameterType="vote">
+		INSERT INTO comments VALUES(SEQ_COMMENTS.NEXTVAL, #{cb_index}, #{m_id}, #{co_content}, default, #{secretChk})
+	</insert>
+	
+	<!-- 댓글 가져오기 -->
+	<select id="getCommList" parameterType="vote" resultType="vote">
+	<![CDATA[
+		SELECT * FROM 
+		(SELECT ROWNUM AS RNUM, cm.* FROM (SELECT * FROM comments cm where cb_index = #{cb_index} ORDER BY CO_DATE DESC) cm) 
+		WHERE rnum>=#{pageNum}*7-6 and rnum<=#{pageNum}*7
+		 ]]>
+	</select>
+	
+	<!-- 댓글 총 갯수 가져오기 -->
+	<select id="commSum" parameterType="int" resultType="int">
+		SELECT COUNT(co_index) FROM comments WHERE cb_index = #{cb_index}
+	</select>
+	
+	<!-- 댓글 삭제 -->
+	<delete id="comDelete" parameterType="int">
+    	DELETE FROM comments WHERE co_index = #{co_index}
+    </delete>
+		
+    <!-- 투표 게시판 수정(미리 값 찍어놓기) -->
+    <select id="voteUpdate" parameterType="vote" resultType="vote">
+		SELECT * FROM comboard WHERE cb_index = #{cb_index}
+	</select>
+	
+	<!-- 수정 시 파일 이름 가져오기 -->
+    <select id="getOriFileName" parameterType="map" resultType="String">
+		SELECT f_oriName FROM (SELECT ROWNUM AS RRNUM, VS.* FROM VOTE_SINGLE VS WHERE CB_INDEX = #{cb_index}) V WHERE V.RRNUM = #{rnum}
+	</select>
+	
+	<!-- 수정 시 기존 파일 삭제 -->
+	<delete id="voteFileDelete" parameterType="vote">
+		DELETE FROM files WHERE cb_index = #{cb_index}
+	</delete>
+
+	<!-- 글 수정 -->
+	<!-- UPDATE emp SET hiredate = '17/12/09' WHERE ename = 'han'; -->
+    <update id="voteUpdate_last" parameterType="vote">
+    	UPDATE comboard SET cb_subject = #{cb_subject}, cb_content = #{cb_content} WHERE cb_index = #{cb_index}
+    </update>
+    
+    <!-- 글 삭제 -->
+    <delete id="voteComDelete" parameterType="int">
+    	DELETE FROM comboard WHERE cb_index = #{cb_index}
+    </delete>
+    
+    <!-- 글 삭제 시 파일 이름 찾기 -->
+    <select id="voteDelete" parameterType="map" resultType="files">
+		SELECT fs_index, f_newName FROM (SELECT ROWNUM AS RRNUM, VS.* FROM VOTE_SINGLE VS WHERE CB_INDEX = #{cb_index}) V WHERE V.RRNUM = #{rnum}
+	</select>
+	 
+	 <!-- 투표 게시판 - 글 포인트 부여 -->
+	<update id="votePoint" parameterType="String">
+    	UPDATE Point SET p_point = p_point+5 WHERE m_id = #{m_id}
+    </update>	
+    
+    <!-- 투표 게시판 - 댓글 포인트 부여 -->
+	<update id="voteReplyPoint" parameterType="String">
+    	UPDATE Point SET p_point = p_point+2 WHERE m_id = #{m_id}
+    </update>
+</mapper>
+

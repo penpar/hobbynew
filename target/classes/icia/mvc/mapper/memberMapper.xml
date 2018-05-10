@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"><!-- 이건 mapper 파일이고 버전은 3.0이다 -->
+
+
+<mapper namespace="icia.mvc.dao.ImemberDao">
+	
+	<!-- 아이디 중복체크 -->
+	<select id="mb_checkId" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM MEMBER WHERE M_ID=#{m_id}
+	</select>
+	
+	<!-- 로그인 -->
+	<select id="mb_Login" parameterType="member" resultType="int">
+        SELECT COUNT(*) FROM MEMBER WHERE M_ID=#{m_id} AND M_PW=#{m_pw}
+    </select>
+	
+	<!-- 로그인한 정보 가져오기 -->
+	<select id="getMemberInfo" parameterType="String" resultType="member">
+        SELECT * FROM M_VIEW WHERE M_ID=#{m_id}
+    </select>
+
+	<!-- 일반 유저 회원가입 -->
+	<insert id="mb_Join" parameterType="member">
+		INSERT INTO MEMBER(M_ID,M_PW,M_GENDER,M_PHONE,M_BIRTH,M_EMAIL,M_ADDRESS,M_DATE,M_INTRO,M_SORT,M_WARN,M_NAME) 
+		VALUES(#{m_id},#{m_pw},#{m_gender},#{m_phone},#{m_birth},#{m_email},#{m_address},sysdate,default,'1','0',#{m_name})
+	</insert>
+	
+	<!-- 일반 유저 회원가입시 관심분야 저장 -->
+	<insert id="ch_check" parameterType="member">
+		INSERT INTO CHECKS VALUES(#{m_id},#{m_hobby})
+	</insert>
+	
+	<!-- 일반 유저 회원가입시 포인트 경험치 저장 -->
+	<insert id="p_pointExp" parameterType="member">
+		INSERT INTO POINT VALUES(#{m_id},'1000','0')
+	</insert>
+	
+	<!-- 취미 아티스트 회원가입 멤버테이블 등록-->
+	<insert id="mb_ArtJoin" parameterType="member">
+		INSERT INTO MEMBER(M_ID,M_PW,M_GENDER,M_PHONE,M_BIRTH,M_EMAIL,M_ADDRESS,M_DATE,M_INTRO,M_SORT,M_WARN,M_NAME) 
+		VALUES(#{m_id},#{m_pw},#{m_gender},#{m_phone},#{m_birth},#{m_email},#{m_address},sysdate,#{m_intro},'4','0',#{m_name})
+	</insert>
+	
+	<!-- 취미 아티스트 회원가입 시 파일 테이블 등록 -->
+	<insert id="m_ArtFileInserte" parameterType="map">
+		INSERT INTO FILES(F_INDEX,M_ID,FS_INDEX,F_ORINAME,F_NEWNAME) VALUES(seq_files.NEXTVAL,#{m_id},#{fs_index},#{oriFileName},#{sysFileName})
+	</insert>
+	
+	<!-- 회원 탈퇴 시 -->
+	<update id="mp_MyOut" parameterType="String">
+		UPDATE MEMBER SET M_SORT='5' WHERE M_ID = #{m_id}
+	</update>
+	
+	<!-- 마이페이지 정보 수정 -->
+	<update id="mp_MyInfoChange" parameterType="member">
+		UPDATE MEMBER SET M_NAME=#{m_name},M_EMAIL=#{m_email},M_PHONE=#{m_phone},M_ADDRESS=#{m_address} WHERE M_ID=#{m_id}
+	</update>
+	
+	<!-- 마이페이지 이동 시 포인트 가져오기 -->
+	<select id="getPoint" parameterType="String" resultType="int">
+		SELECT  P_POINT FROM M_VIEW WHERE M_ID=#{m_id}
+	</select>
+	
+	
+	<!-- 비밀번호 변경 -->
+	<update id="mp_ChangePw" parameterType="member">
+		UPDATE MEMBER SET M_PW=#{m_pw} WHERE M_ID=#{m_id}
+	</update>
+	
+	<!-- 아이디 찾기 -->
+	<select id="idFind" parameterType="member" resultType="String">
+		SELECT M_ID FROM MEMBER WHERE M_NAME=#{m_name} AND M_EMAIL=#{m_email}
+	</select>
+	
+	<!-- 비밀번호 찾기 -->
+	<select id="pwFind" parameterType="member" resultType="String">
+		SELECT M_PW FROM MEMBER WHERE M_ID=#{m_id} AND M_NAME=#{m_name} AND M_EMAIL=#{m_email}
+	</select>
+	
+</mapper>

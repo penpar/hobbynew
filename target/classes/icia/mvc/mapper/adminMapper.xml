@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- adminMapper.xml : 관리자 관련 쿼리문 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.mvc.dao.IadminDAO">
+	<select id="getUserList" resultType="user">
+		SELECT * FROM MEMBER ORDER BY M_DATE DESC
+	</select>
+	
+	<select id="getUserSortList" parameterType="int" resultType="user">
+		SELECT * FROM MEMBER WHERE M_SORT = #{sort} ORDER BY M_DATE DESC
+	</select>
+	
+	<select id="getUserSearchList" parameterType="String" resultType="user">
+		SELECT * FROM MEMBER WHERE M_ID LIKE '%'||#{searchValue}||'%' ORDER BY M_DATE DESC
+	</select>
+	
+	<!-- 문의 관리에서 회원 검색 -->
+	<select id="qUserSearch" parameterType="String" resultType="icia.mvc.bean.Board">
+		SELECT * FROM QA_VIEW WHERE M_ID LIKE '%'||#{searchValue}||'%' ORDER BY cb_date DESC
+	</select>
+	
+	<update id="updateUserSort" parameterType="String">
+		UPDATE MEMBER SET M_SORT = 5 WHERE M_ID = #{m_id}
+	</update>
+	
+	<update id="updateUserWarn" parameterType="String">
+	   UPDATE MEMBER SET M_WARN = M_WARN+1 WHERE M_ID = #{m_id}
+	</update>
+	
+	<select id="getUserCount" parameterType="String" resultType="int">
+		SELECT M_WARN FROM MEMBER WHERE M_ID = #{m_id}
+	</select>
+	
+	<select id="getReportList" resultType="report">
+		SELECT * FROM REPORT ORDER BY RP_DATE DESC
+	</select>
+	
+	<select id="getClassNameList" resultType="className">
+		SELECT * FROM CN_VIEW ORDER BY RNUM ASC
+	</select>
+	
+	<insert id="setClassName" parameterType="String">
+		INSERT INTO CLASSNAME VALUES(SEQ_CLASSNAME.NEXTVAL, #{cn_name})
+	</insert>
+	
+	<delete id="delClassName" parameterType="String">
+		DELETE FROM CLASSNAME WHERE CN_NAME=#{cn_name}
+	</delete>
+	
+	<!-- 문의 관리 - 리스트 -->
+	<select id="questionMgt" resultType="icia.mvc.bean.Board">
+		SELECT * FROM QA_VIEW2 WHERE cb_sort = 4 ORDER BY cb_date ASC
+	</select>
+	
+	<!-- 문의 관리 - 종류 분류 -->
+	<select id="questionMgtSort" parameterType="String" resultType="icia.mvc.bean.Board">
+		SELECT * FROM QA_VIEW2 WHERE q_type = #{sort} ORDER BY cb_date ASC
+	</select>
+
+	<!-- 취미아티스트 회원가입 심사 리스트 -->
+	<select id="getJudgeList" parameterType="user" resultType="user">
+		<if test='m_id == ""'>
+			SELECT * FROM MF_VIEW WHERE M_SORT=4
+		</if>
+		<if test='m_id != ""'>
+			SELECT * FROM MF_VIEW WHERE M_SORT=4 AND M_ID=#{m_id}
+		</if>
+	</select>
+	
+	<!-- 취미아티스트 회원가입 심사 승인 -->
+	<update id="joinComfirm" parameterType="String">
+		UPDATE MEMBER SET M_SORT=3 WHERE M_ID=#{m_id}
+	</update>
+	
+	<!-- 취미아티스트 회원가입 심사 거절 -->
+	<delete id="joinDelete">
+		DELETE FROM MEMBER WHERE M_ID=#{m_id}
+	</delete>	
+	
+	<!-- 전환 심사 글쓰기 -->
+	<insert id="changeWrite" parameterType="classBean" useGeneratedKeys="true" keyProperty="c_index">
+		INSERT INTO Class(c_index, m_id, c_subject, c_simpleContent, c_minPerson, c_maxPerson, c_startDay,
+		c_endDay, c_address, c_price, c_content, c_refund,c_status, c_date)
+		VALUES(SEQ_CLASS.NEXTVAL, #{m_id}, #{c_subject}, #{c_simpleContent}, #{c_minPerson}, #{c_maxPerson}, #{c_startDay}, #{c_endDay},
+		#{c_address}, 0, 0, 0, 5, SYSDATE)
+		<selectKey keyProperty="c_index" resultType="int" order="AFTER">
+			SELECT SEQ_CLASS.CURRVAL FROM DUAL
+		</selectKey>
+	</insert>
+
+	<!-- 전환 심사 투표url 입력 -->
+	<insert id="setVoteUrl" parameterType="classBean">
+		INSERT INTO CHANGE VALUES(#{c_index}, #{ch_voteUrl})
+	</insert>
+	
+	<!-- 클래스 파일 입력 -->
+	<insert id="changeFileInsert" parameterType="files">
+		INSERT INTO CLASSFILE VALUES(#{c_index}, #{cs_index}, #{f_oriName}, #{f_newName})
+	</insert>
+	
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- boardMapper.xml : 게시판관련 쿼리문 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.mvc.dao.IPaymentDAO">
+	
+
+	<select id="classPayment" parameterType="int" resultType="icia.mvc.bean.ClassBean">
+		SELECT * FROM CLASS_VIEW2 WHERE C_INDEX=#{c_index}
+	</select>
+	
+	
+	<insert id="payInsert" parameterType="icia.mvc.bean.Pay">
+		INSERT INTO PAYLIST VALUES(#{c_index},#{m_id},#{pl_pay},SYSDATE)
+	</insert>
+	
+	
+	<update id = "pDecrease" parameterType="icia.mvc.bean.Member">
+		UPDATE POINT
+		SET P_POINT = (SELECT P_POINT FROM POINT WHERE M_ID=#{m_id}) - #{p_point}
+		WHERE m_id = #{m_id}
+	</update>
+	
+	
+	<update id = "pIncrease" parameterType="icia.mvc.bean.Member">
+	UPDATE POINT
+	SET P_POINT =(SELECT P_POINT FROM POINT WHERE M_ID=#{m_id}) + #{p_point}
+	WHERE m_id = #{m_id}
+
+	</update>
+	
+	
+	<insert id="payDelete" parameterType="icia.mvc.bean.Member">
+		DELETE FROM PAYLIST WHERE C_INDEX = #{c_index} AND M_ID=#{m_id} 
+	</insert>
+	
+	<select id="payList" parameterType="icia.mvc.bean.Pay" resultType="icia.mvc.bean.Pay"	>
+		SELECT * from PAYLIST WHERE C_INDEX = #{c_index} AND M_ID=#{m_id} 
+	
+	</select>
+	
+	
+	
+	
+
+</mapper>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ebMapper.xml : 한은비 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.mvc.dao.SiteIntroDAO">
+	
+	<!-- 사이트 소개 - 공통 게시판 글쓰기 -->
+	<insert id="comboardWrite" parameterType="Map" useGeneratedKeys="true" keyProperty="cb_index">
+		INSERT INTO comboard VALUES(seq_comboard.NEXTVAL, #{m_id}, #{cb_subject}, 0, #{cb_content}, default, #{cb_sort})
+		<selectKey keyProperty="cb_index" resultType="String" order="AFTER">
+			SELECT seq_comboard.currval FROM DUAL
+		</selectKey>
+	</insert>
+	
+	<!-- 사이트 소개 파일업로드 -->
+	<insert id="siteFileInsert" parameterType="Map">
+		INSERT INTO files VALUES(SEQ_FILES.NEXTVAL, #{fs_index},  #{cb_index}, #{m_id}, #{oriFileName}, #{sysFileName})
+	</insert>
+	
+	<!-- 사이트 소개 가장 최신데이터 불러오기 -->
+	<select id="getSiteIntro" parameterType="int" resultType="siteIntro">
+		SELECT * FROM SITE_INTRO_VIEW2 WHERE RNUM=#{rnum}
+	</select> 
+</mapper>

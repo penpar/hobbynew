@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- boardMapper.xml : 게시판관련 쿼리문 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.mvc.dao.IlocationDAO">
+	
+	
+	
+	<select id="mmAdress" parameterType="String" resultType="String">
+		
+			SELECT M_ADDRESS FROM MEMBER WHERE m_id = #{id}
+			
+	</select>
+	
+	
+	<select id="locatioInfo" resultType="classBean">
+		
+			SELECT * FROM CLASS
+			
+	</select>
+	
+	
+		<select id="locSort" parameterType="int" resultType="classBean">
+		
+		
+			SELECT * FROM CLASS WHERE cn_index= #{sort}
+			
+	</select>
+	
+	</mapper>
