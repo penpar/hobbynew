@@ -25,6 +25,7 @@
 
 
 ### [작성한 XML]
+#### NoteMapper.xml
 ~~~XML
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -117,7 +118,7 @@
 
 </mapper>
 ~~~
-
+#### mySpaceMapper.xml
 ~~~XML
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -173,7 +174,7 @@
 </mapper>
 
 ~~~
-
+#### locationMapper.xml
 ~~~XML
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -197,6 +198,7 @@
 	</mapper>
 ~~~
 
+#### paymentMapper.xml
 ~~~XML
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
