@@ -22,3 +22,32 @@
 ### [JAVA pakage]
 
 ![JAVA_pakage](https://user-images.githubusercontent.com/17943275/41798811-9e9a15c0-765e-11e8-995d-e34adcbd249e.png)
+
+
+### [작성한 XML]
+~~~XML
+<?xml version="1.0" encoding="UTF-8"?>
+ </mapper>http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+ </mapper>
+
+~~~
+
+
