@@ -74,7 +74,7 @@
 		UPDATE NOTE SET N_SORT = '1' WHERE n_index = #{index}
 	</update>
 	
-	<!-- 안읽은 쪽지 개수 -->
+	<!-- 읽 쪽지 개수 -->
 	<select id="noteCount" parameterType="String" resultType="int">
 	SELECT count(N_SORT)
 	FROM NOTE N
