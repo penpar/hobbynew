@@ -10,6 +10,12 @@
 
 
 
-### [ERD] 데이터 베이스 구조 
+### [ERD] DB 
 
 ![erd_habby](https://user-images.githubusercontent.com/17943275/41738686-480a2376-7582-11e8-930f-ed815f1ca86c.png)
+
+
+
+### [JAVA pakage]
+
+https://user-images.githubusercontent.com/17943275/41798811-9e9a15c0-765e-11e8-995d-e34adcbd249e.png)
