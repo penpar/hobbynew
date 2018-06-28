@@ -160,12 +160,10 @@ public class NoteMM {
 
 	public ModelAndView nt_NoteWrite() {
 		Note nt = new Note();
-		
 		String m_id = request.getParameter("m_id");
 		String m_id2 = request.getParameter("m_id2");
 		String n_subject = request.getParameter("n_subject");
 		String n_content = request.getParameter("n_content");
-		
 		int checkId = nDao.checkId(m_id2);
 		if(checkId==1){
 		int n_state = 0;
@@ -193,7 +191,6 @@ public class NoteMM {
 	
 	public String popclose(){
 		StringBuilder tag = new StringBuilder();
-		
 		tag.append("\n");
 		tag.append(" $(document).ready( function() {\n");
 		tag.append("window.opener.top.location.href='noteList';\n");
@@ -201,7 +198,6 @@ public class NoteMM {
 		tag.append("alert('쪽지 전송이 완료되었습니다.')\n");
 		tag.append(" self.close()  \n");   
 		tag.append("});\n");
-
 		return tag.toString();
 	}
 	
@@ -214,7 +210,7 @@ public class NoteMM {
 		return tag.toString();
 	}
 
-	public int noteDelete(int index,int n_state) {			
+	public void noteDelete(int index,int n_state) {			
 		Note nt = new Note();
 		nt = nDao.noteDetail(index);
 		int chk = nt.getN_state();
@@ -227,24 +223,20 @@ public class NoteMM {
 		
 		nt.setN_index(index);
 		nDao.noteState(nt);
-		return 0;
 	}
 
-	public int noteReport(int index) {
+	public void noteReport(int index) {
 		int suc = 0;
 		suc = nDao.noteReport(index);
-		return 0;
 	}
 
-
-	public int noteBlock(String id_1, String id_2) {   // 1 요청자 2받은 사람
+	public void noteBlock(String id_1, String id_2) {   // 1 요청자 2받은 사람
 		HashMap<String, Object> setBlock = new HashMap<String, Object>();
 		setBlock.put("M_ID", id_1);
 		setBlock.put("M_ID2", id_2);
 		int suc = 0;
 		suc = nDao.noteBlock(setBlock);
 		mav.setViewName("note/noteList");
-		return 0;
 	}
 
 	public ModelAndView nt_NoteDetail(int index) {
@@ -256,14 +248,12 @@ public class NoteMM {
 		return mav;
 	}
 
-
 	public void noteAuto(String id){
 		List<String> deadSubject = null;
 		HashMap<String, String> noteAuto = null;
 		int ch = 0;
 		ch = nDao.noteCheck(id); 
 		if(ch==0){
-			
 			deadSubject = nDao.noteAuto(id);
 			if(deadSubject.size()!=0){
 			for(int i=0; i<deadSubject.size(); i++){
