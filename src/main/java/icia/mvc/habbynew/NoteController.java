@@ -41,7 +41,6 @@ public class NoteController {
 	   public ModelAndView noteList() {
 			Member mb = (Member) session.getAttribute("mb");
 			String id = mb.getM_id();
-			System.out.println("id ="+id);
 			nt.noteAuto(id);
 			mav = nt.nt_SendNoteList(id);	 
 			return mav;
@@ -52,7 +51,6 @@ public class NoteController {
 	   public ModelAndView mailForm() {
 			mav = new ModelAndView();
 			mav.setViewName("note/mailWriteForm");
-			System.out.println("mailForm !!");
 			return mav;
 	   }
 	
@@ -71,17 +69,14 @@ public class NoteController {
 			mav = new ModelAndView();
 			mav.setViewName("mailWrite");
 			mav = nt.nt_NoteWrite();
-			System.out.println("mailWrite 소환!!");
-			
-		   return mav;
+			return mav;
 	   }
 	
 	@RequestMapping(value = "/noteBlock", method = RequestMethod.GET)
 	public String noteBlock(
 			@RequestParam("id_1") String id_1, 
 			@RequestParam("id_2") String id_2){
-		System.out.println("black  "+ id_1+" " + id_2);
-		nt.noteBlock(id_1,id_2);
+			nt.noteBlock(id_1,id_2);
 		return "redirect:/noteList";
 	}
 
@@ -103,22 +98,16 @@ public class NoteController {
 	    		List<Note> note = null;
 	    		for (int index : rowCheck0) {
 		    		note = nt.m_id2Ban(index); 	 
-		    		System.out.println(note.get(0).getM_id());
-		    		System.out.println(note.get(0).getN_index());		
-				return "redirect:/banWrite?sort=4&m_id2="+note.get(0).getM_id()+"&index="+note.get(0).getN_index();
+		    		return "redirect:/banWrite?sort=4&m_id2="+note.get(0).getM_id()+"&index="+note.get(0).getN_index();
 	    		}  
 	    	}   
-	    	else if(sort == 3) {
-	    		System.out.println("보낸 쪽지 삭제 수행");
+	    	else if(sort == 3) { // 보낸 쪽지 삭제
 	    		for (int index : rowCheck0) {
-			        System.out.println("메모 삭제1 = " + index);
 			        int countDel = nt.noteDelete(index,3);  
 		    	}  
 	    		
-	    	}else if(sort == 4) {
-	    		System.out.println("받은 쪽지 삭제 수행");
-	    		for (int index : rowCheck0) {
-			        System.out.println("메모 삭제1 = " + index);
+	    	}else if(sort == 4) { // 받은 쪽지 삭제
+	    		for (int index : rowCheck0) {    
 			        int countDel = nt.noteDelete(index,4);  
 		    	}  
 	    	}
@@ -134,7 +123,6 @@ public class NoteController {
 			ModelMap modelMap) throws Exception {
 	    
 	    for(int sort : btn_sort) { // 삭제 실행
-	    	System.out.println("sort :  " + sort);
 	    	if(sort == 1) {
 	    		for (int index : rowCheck1) {
 			        int countDel = nt.noteDelete(index,1);  
@@ -167,12 +155,4 @@ public class NoteController {
 			mav = nt.banInsert(sort,index,m_id2);
 			return mav;
 	   }
-	
-	
-	
-	
-	
-
-	
-	
 }
