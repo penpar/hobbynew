@@ -40,15 +40,13 @@ public class NoteMM {
 		nlist_0 = nDao.getNoteList_0(id);
 		nlist_1 = nDao.getNoteList_1(id);
 
-		System.out.println("nlist");
+		
 		String nlist1 = makeHtmlNlist_Resiv(nlist_1);
 		String nlist0 = makeHtmlNlist_send(nlist_0);
-		System.out.println(nlist_0.size());
-		System.out.println(nlist_1.size());
-
+		
 		// 카운트해서 읽지 않는 수 표시 // 상태가 0인 상태의 컬럼뽑기 // 다시 세션 속성에 넣어 갱신 되게한다.
 		int cnt = nDao.noteCount(id);
-		System.out.println("count : " + cnt);
+		
 		session.setAttribute("cnt",cnt);
 		
 		// 자동 메시지 보내기
@@ -76,7 +74,7 @@ public class NoteMM {
 		tag.append("</tr>\n\n");
 		
 		if(nlist.size()==0){
-			System.out.println("아무 쪽지도 안옴");
+			
 			tag.append("<tr><td colspan = '6'>받은 쪽지가 없습니다.</tr>\n");
 			tag.append("		 </table>\n");
 			tag.append("</form>");
@@ -132,7 +130,7 @@ public class NoteMM {
 		tag.append("	</tr>\n\n");
 		
 		if(nlist.size()==0){ // 처리해야하는 부분
-			System.out.println("아무 쪽지도 안옴");
+			
 			tag.append("<tr><td colspan = '6'>보낸 쪽지가 없습니다.</tr>\n");
 			tag.append("		 </table>\n");
 			tag.append("         <button type='submit' name='btn_sort' value='4' class='eb_btn3'/>삭제</button>\n");
@@ -187,19 +185,13 @@ public class NoteMM {
 		nt.setN_sort(n_sort);
 		nt.setN_state(n_state);
 
-		System.out.println(m_id +" "+  m_id2 +" " + n_subject +" " + n_content);
-		System.out.println(nt);
-		System.out.println(nt.getN_content());
-
-		if(nDao.noteInsert(nt) == 1){
-			System.out.println("성공");
+		if(nDao.noteInsert(nt) == 1){ // 성공 여부
 			String text = popclose();
 			mav.addObject("text" , text);
 			mav.setViewName("note/mailWriteForm");
 		}
 		
-		}else{
-			System.out.println("아이디 체크 어럴트");
+		}else{ // id check
 			String checkIdAlert = checkId();
 			mav.addObject("text" , checkIdAlert);
 			mav.setViewName("note/mailWriteForm");
@@ -231,57 +223,42 @@ public class NoteMM {
 	}
 
 	public int noteDelete(int index,int n_state) {			
-		System.out.println("noteDelete"+index);
 		Note nt = new Note();
 		nt = nDao.noteDetail(index);
 		int chk = nt.getN_state();
-		System.out.println("check "+ chk);
-		
+				
 		if(chk == 3 || chk == 4){
 			nt.setN_state(5);
 		}else{
 			nt.setN_state(n_state);
 		}
+		
 		nt.setN_index(index);
-		System.out.println("chk " +chk);
 		nDao.noteState(nt);
-		System.out.println("여기까지 되면 됨");
 		return 0;
 	}
 
 	public int noteReport(int index) {
-		System.out.println("noteBan"+index);
 		int suc = 0;
 		suc = nDao.noteReport(index);
 		return 0;
 	}
 
 
-	public int noteBlock(String id_1, String id_2) {
-		System.out.println("noteBlock"+id_1 + id_2);
-
-		// 1 요청자 2받은 사람
+	public int noteBlock(String id_1, String id_2) {   // 1 요청자 2받은 사람
 		HashMap<String, Object> setBlock = new HashMap<String, Object>();
 		setBlock.put("M_ID", id_1);
 		setBlock.put("M_ID2", id_2);
-
 		int suc = 0;
 		suc = nDao.noteBlock(setBlock);
-		System.out.println(suc);
 		mav.setViewName("note/noteList");
 		return 0;
 	}
 
 	public ModelAndView nt_NoteDetail(int index) {
 		Note nt = new Note();
-		System.out.println("index  :  "+index);
-		
-		// detail
 		nt = nDao.noteDetail(index);
-		System.out.println("size : " +nt);
-		
 		nDao.noteWriteChange(index);
-
 		mav.addObject("nDetail", nt);
 		mav.setViewName("note/noteDetail");
 		return mav;
@@ -296,13 +273,9 @@ public class NoteMM {
 		if(ch==0){
 			
 			deadSubject = nDao.noteAuto(id);
-			System.out.println("size : " + deadSubject.size());
-	
 			if(deadSubject.size()!=0){
 			for(int i=0; i<deadSubject.size(); i++){
-				System.out.println(deadSubject.get(i));	
 				String n_content = "관심 클래스로 등록한 "+ deadSubject.get(i)+"의 마감 기한이 하루 남았습니다.";
-
 				int n_state = 0;
 				int n_sort = 0 ;
 				Note nt = new Note();
@@ -315,7 +288,6 @@ public class NoteMM {
 				int s = 0;
 				if(nDao.noteInsert(nt) == 1){
 					s = 1;
-					System.out.println("성공");
 				}
 			}
 		}
@@ -336,7 +308,6 @@ public class NoteMM {
 		mav = new ModelAndView();
 		Member mb = (Member) session.getAttribute("mb");
 		String id = mb.getM_id();
-		System.out.println("id ="+id);
 		String b_selected = request.getParameter("b_selected");
 		String b_text = request.getParameter("b_text");
 		try {
@@ -344,7 +315,6 @@ public class NoteMM {
 		} catch (Exception e) {
 			
 		}
-		System.out.println(m_id2 + b_selected + b_text + sort + index);
 		Report rt = new Report();	
 		rt.setM_id(id);
 		rt.setM_id2(m_id2);
@@ -353,7 +323,8 @@ public class NoteMM {
 		rt.setRp_content(b_text);
 		rt.setRp_index(index);
 		nDao.banInsert(rt); 
-		// 신고 작성 폼에서 취소 누를 경우 전 페이지로 이동하기 위한 분류
+		
+		// 신고 작성 폼에서 취소 클릭 시 전 페이지로 이동하기 위한 분류
 		if(sort==4){ // note로 이동
 			mav.setViewName("redirect:/noteList");
 		}else if(sort==0){ // 투표 페이지
@@ -367,7 +338,6 @@ public class NoteMM {
 		}else if(sort==5){ // 취미 클래스
 			mav.setViewName("redirect:/classDetail_contents?c_index="+c_index);
 		}
-		
 		return mav;
 	}
 	
