@@ -36,23 +36,15 @@ public class NoteMM {
 		mav = new ModelAndView();
 		ArrayList<Note> nlist_0 = new ArrayList<>();
 		ArrayList<Note> nlist_1 = new ArrayList<>();
-
 		nlist_0 = nDao.getNoteList_0(id);
 		nlist_1 = nDao.getNoteList_1(id);
-
-		
 		String nlist1 = makeHtmlNlist_Resiv(nlist_1);
 		String nlist0 = makeHtmlNlist_send(nlist_0);
-		
 		// 카운트해서 읽지 않는 수 표시 // 상태가 0인 상태의 컬럼뽑기 // 다시 세션 속성에 넣어 갱신 되게한다.
 		int cnt = nDao.noteCount(id);
-		
 		session.setAttribute("cnt",cnt);
-		
-		// 자동 메시지 보내기
 		mav.addObject("nlist0", nlist0); // 보낸 쪽지 목록을 StringBuilder 형태로 처리하여 view에 보낸다.
 		mav.addObject("nlist1", nlist1); // 받은 쪽지 목록을 StringBuilder 형태로 처리하여 view에 보낸다.
-		
 		view = "note/noteList";
 		mav.setViewName(view);
 		return mav;
