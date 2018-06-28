@@ -47,7 +47,7 @@
 	<!-- 자동 알림 쪽지 아이디 체크 -->
 	<select id = "noteCheck" parameterType="String" resultType="int">
 		SELECT count(*) FROM NOTE
-		WHERE M_id = 'admin' AND M_ID2 = 'aaaaaa' AND to_CHAR(N_DATE,'yyyy/mm/dd') = to_CHAR(sysdate,'yyyy/mm/dd')
+		WHERE M_id = 'admin' AND M_ID2 = #{id} AND to_CHAR(N_DATE,'yyyy/mm/dd') = to_CHAR(sysdate,'yyyy/mm/dd')
 	</select>
 	
 	<!-- 쪽지 작성 -->
