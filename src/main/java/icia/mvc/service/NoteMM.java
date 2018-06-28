@@ -230,7 +230,7 @@ public class NoteMM {
 		suc = nDao.noteReport(index);
 	}
 
-	public void noteBlock(String id_1, String id_2) {   // 1 요청자 2받은 사람
+	public void noteBlock(String id_1, String id_2) {   // 1. 요청자 2. 대상자
 		HashMap<String, Object> setBlock = new HashMap<String, Object>();
 		setBlock.put("M_ID", id_1);
 		setBlock.put("M_ID2", id_2);
