@@ -39,12 +39,9 @@ public class NoteController {
 	
 	@RequestMapping(value = "/noteList", method = RequestMethod.GET)
 	   public ModelAndView noteList() {
-		
-		
 			Member mb = (Member) session.getAttribute("mb");
 			String id = mb.getM_id();
 			System.out.println("id ="+id);
-			
 			nt.noteAuto(id);
 			mav = nt.nt_SendNoteList(id);	 
 			return mav;
@@ -75,7 +72,8 @@ public class NoteController {
 			mav.setViewName("mailWrite");
 			mav = nt.nt_NoteWrite();
 			System.out.println("mailWrite 소환!!");
-			return mav;
+			
+		   return mav;
 	   }
 	
 	@RequestMapping(value = "/noteBlock", method = RequestMethod.GET)
@@ -89,8 +87,8 @@ public class NoteController {
 
 	@RequestMapping(value = "/mailDetail", method = RequestMethod.GET)
 	   public ModelAndView mailDetail(@RequestParam("index") int index) {
-			mav = nt.nt_NoteDetail(index);
-			return mav;
+		   mav = nt.nt_NoteDetail(index);
+		   return mav;
 	   }
 
 	@RequestMapping(value = "/mailDelete", method = RequestMethod.POST)
@@ -104,13 +102,10 @@ public class NoteController {
 	     	if(sort == 2) {
 	    		List<Note> note = null;
 	    		for (int index : rowCheck0) {
-	    			
-		    		System.out.println("신고 수행");
 		    		note = nt.m_id2Ban(index); 	 
 		    		System.out.println(note.get(0).getM_id());
-		    		System.out.println(note.get(0).getN_index());
-		    				
-		    		return "redirect:/banWrite?sort=4&m_id2="+note.get(0).getM_id()+"&index="+note.get(0).getN_index();
+		    		System.out.println(note.get(0).getN_index());		
+				return "redirect:/banWrite?sort=4&m_id2="+note.get(0).getM_id()+"&index="+note.get(0).getN_index();
 	    		}  
 	    	}   
 	    	else if(sort == 3) {
@@ -138,58 +133,38 @@ public class NoteController {
 			@RequestParam("btn_sort") Integer[] btn_sort,
 			ModelMap modelMap) throws Exception {
 	    
-	    for(int sort : btn_sort) {
+	    for(int sort : btn_sort) { // 삭제 실행
 	    	System.out.println("sort :  " + sort);
 	    	if(sort == 1) {
-	    		System.out.println("삭제 수행");
-	    		// 삭제 실행
 	    		for (int index : rowCheck1) {
-			        System.out.println("메모 삭제1 = " + index);
 			        int countDel = nt.noteDelete(index,1);  
 		    	}  
 	    	}
-	    	else if(sort == 2) {
+	    	else if(sort == 2) { // 신고 수행
 	    		List<Note> note = null;
 	    		for (int index : rowCheck1) {
-	    			
-		    		System.out.println("신고 수행");
 		    		note = nt.m_id2Ban(index); 	 
-		    		System.out.println(note.get(0).getM_id());
-		    		System.out.println(note.get(0).getN_index());
-		    		//System.out.println("신고 대상자   " +m_id2);
-		  	    				
-		    		return "redirect:/banWrite?sort=4&m_id2="+note.get(0).getM_id()+"&index="+note.get(0).getN_index();
+		    	return "redirect:/banWrite?sort=4&m_id2="+note.get(0).getM_id()+"&index="+note.get(0).getN_index();
 	    		}  
 	    	}   	
 	    }
-
 	    return "redirect:/noteList";
 	}
 	
-	@RequestMapping(value = "/banWrite", method = RequestMethod.GET)
+	@RequestMapping(value = "/banWrite", method = RequestMethod.GET) // 신고 폼으로 
 	   public ModelAndView banWrite(int sort ,String m_id2,int index) {
 			mav = new ModelAndView();
-			System.out.println("sort" +sort);
-			System.out.println("m_id2" +m_id2);
-			System.out.println("index" +index);
-			
 			mav.addObject("m_id2",m_id2);
 			mav.addObject("sort",sort);
 			mav.addObject("index",index);
-			
 			mav.setViewName("NYJ/banWrite");
-			
 			return mav;
 	   }
 	
-	@RequestMapping(value = "/banInsert", method = RequestMethod.GET)
+	@RequestMapping(value = "/banInsert", method = RequestMethod.GET) // 신고 내용 작성
 	   public ModelAndView banInsert(int sort, String m_id2, int index) {
 			mav = new ModelAndView();
-			
-			
 			mav = nt.banInsert(sort,index,m_id2);
-			
-			
 			return mav;
 	   }
 	
