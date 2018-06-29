@@ -179,8 +179,6 @@ public class NoteMM {
 			String text = popclose();
 			mav.addObject("text" , text);
 			mav.setViewName("note/mailWriteForm");
-		}
-		
 		}else{ // id check
 			String checkIdAlert = checkId();
 			mav.addObject("text" , checkIdAlert);
@@ -220,7 +218,6 @@ public class NoteMM {
 		}else{
 			nt.setN_state(n_state);
 		}
-		
 		nt.setN_index(index);
 		nDao.noteState(nt);
 	}
