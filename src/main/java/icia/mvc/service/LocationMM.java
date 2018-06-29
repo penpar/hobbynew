@@ -37,37 +37,25 @@ public class LocationMM {
 		      
 		      // 자신의 위치 좌표
 		      String myLocation = lDao.mmAdress(id);
-		      System.out.println("myLocation" + myLocation);
-		      
 		      // 클래스 위치 표시
 		      locList = lDao.locatioInfo();
 		      String locMark = locMark(locList , myLocation);
 		      String locSelect = locSelect(0);
-		      
-		      // 셀렉트 박스 찍기   
-		      System.out.println(locList);
+		      // 셀렉트 박스 표시 
 		      mav.addObject("locSelect", locSelect);
 		      mav.addObject("test", locMark);
 		      mav.setViewName("location/LBRS"); 
-
 		      return mav;
-
 		   }
-	   
 	   
 	   	public ModelAndView locSort(int sort, String id) {
 	   		ModelAndView mav = new ModelAndView();
 			List<ClassBean> locSort = new ArrayList<ClassBean>();
 			
 			// 자신의 위치 좌표
-		    String myLocation = lDao.mmAdress(id);
-		    System.out.println("myLocation" + myLocation);
-			
-			locSort = lDao.locSort(sort);
-			System.out.println("locSort " + locSort);
-			
-		    String locSelect = locSelect(sort);
-			
+		   	String myLocation = lDao.mmAdress(id);
+		        locSort = lDao.locSort(sort);
+		   	String locSelect = locSelect(sort);
 			String locMark = locMark(locSort,myLocation);
 			mav.addObject("locSelect", locSelect);
 			mav.addObject("check", sort);
