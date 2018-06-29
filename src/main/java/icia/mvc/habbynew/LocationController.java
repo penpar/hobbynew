@@ -29,30 +29,20 @@ public class LocationController {
 	@RequestMapping(value = "/locService", method = RequestMethod.GET)
 	   public ModelAndView locService() {
 			mav = new ModelAndView();
-			
 			Member mb = (Member) session.getAttribute("mb");
 			System.out.println(mb);
 			String id = mb.getM_id();
-			System.out.println("id ="+id);
-			System.out.println("locService 소환!");
-			
-			mav = loc.locations(id);
-			
+		   	mav = loc.locations(id);	
 			return mav;
 	   }
 	
 	@RequestMapping(value = "/locSort", method = RequestMethod.GET)
 	   public ModelAndView locSort(int sort) {
 			mav = new ModelAndView();
-			
 			Member mb = (Member) session.getAttribute("mb");
 			System.out.println(mb);
 			String id = mb.getM_id();
-			System.out.println("id ="+id);
-			System.out.println("locService 소환!");
-			
 			mav = loc.locSort(sort,id);
-			
 			return mav;
 	   }
 	
