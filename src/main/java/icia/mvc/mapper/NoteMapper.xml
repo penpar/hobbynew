@@ -52,7 +52,8 @@
 	
 	<!-- 쪽지 작성 -->
 	<insert id="noteInsert" parameterType="icia.mvc.bean.Note">
-		INSERT INTO NOTE VALUES(SEQ_NOTE.NEXTVAL, #{m_id}, #{m_id2}, #{n_state}, to_char(sysdate,'yyyy/mm/dd') ,#{n_subject}, #{n_content}, #{n_sort})
+		INSERT INTO NOTE VALUES(SEQ_NOTE.NEXTVAL, #{m_id}, #{m_id2}, #{n_state}, 
+					to_char(sysdate,'yyyy/mm/dd') ,#{n_subject}, #{n_content}, #{n_sort})
 	</insert>
 	
 	<!-- 보낸 쪽지 삭제 -->
