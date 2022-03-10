@@ -1,4 +1,4 @@
-# hobbynew 
+# Hobbynew 
 
 ### 프로젝트 기획 <br/>
 [소수의 취향.pdf](https://github.com/penpar/hobbynew/files/2129209/default.pdf)
